@@ -35,19 +35,53 @@ def add_classroom():
     db.session.commit()
     return jsonify({"message": f"Classroom {classroom.name} added under {building.name}!"}), 201
 
+
 @main_bp.route("/buildings", methods=["GET"])
 def get_buildings():
-    """모든 건물 및 포함된 강의실 조회"""
+    """건물 및 강의실 조회 (개별 조회 가능)"""
+    query_id = request.args.get("id")
+
+    if query_id:
+        parts = query_id.split("-")
+
+        if len(parts) == 1:
+            # 건물 ID만 주어진 경우
+            building = Building.query.get(parts[0])
+            if not building:
+                return jsonify({"error": "Building not found!"}), 404
+
+            result = {
+                "id": building.id,
+                "name": building.name,
+                "classrooms": [
+                    {"id": c.id, "name": c.name, "floor": c.floor, "code": c.code}
+                    for c in building.classrooms
+                ],
+            }
+            return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+
+        elif len(parts) == 2:
+            # 건물ID-강의실ID 형식으로 요청된 경우
+            building_id, classroom_id = parts
+            classroom = Classroom.query.filter_by(id=classroom_id, building_id=building_id).first()
+            if not classroom:
+                return jsonify({"error": "Classroom not found!"}), 404
+
+            result = {
+                "id": classroom.id,
+                "name": classroom.name,
+                "floor": classroom.floor,
+                "code": classroom.code,
+                "building_id": classroom.building_id,
+            }
+            return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+
+    # ID가 없는 경우 모든 건물 목록만 반환
     buildings = Building.query.all()
-    result = [
-        {
-            "id": b.id,
-            "name": b.name,
-            "classrooms": [
-                {"id": c.id, "name": c.name, "floor": c.floor, "code": c.code}
-                for c in b.classrooms
-            ],
-        }
-        for b in buildings
-    ]
+    result = [{"id": b.id, "name": b.name} for b in buildings]
+
     return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+
+@main_bp.route("/navigate", methods=["GET", "POST"])
+def navigate():
+    return
