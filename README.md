@@ -6,7 +6,7 @@
 
 - **Repository Management** : @Movingju
 
-- **Design** : 
+- **Design** : @lyksunny1214
 
 - **Frontend** : @ParkingLot0326, @seohyunlee-coding, @moolzoo
 
