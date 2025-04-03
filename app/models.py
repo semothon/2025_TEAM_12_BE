@@ -26,3 +26,14 @@ class CoalitionList(db.Model):
     name = db.Column(db.String(255), nullable=False)
     what_type = db.Column(db.String(50), nullable=False)
     coalition_id = db.Column(db.Integer, db.ForeignKey("coalition.id"), nullable=False)  # 연합 테이블 참조 (FK)
+
+
+# 게시물 목록 테이블
+class PostList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    author = db.Column(db.String(50), nullable=False)
+    likes = db.Column(db.Integer, default=0)  # 좋아요 개수 추가
+
