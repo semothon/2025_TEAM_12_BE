@@ -28,7 +28,7 @@ class CoalitionList(db.Model):
     coalition_id = db.Column(db.Integer, db.ForeignKey("coalition.id"), nullable=False)  # 연합 테이블 참조 (FK)
 
 
-# 게시물 목록 테이블
+# 게시물 목록 테이블(post_list)
 class PostList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
@@ -37,3 +37,11 @@ class PostList(db.Model):
     author = db.Column(db.String(50), nullable=False)
     likes = db.Column(db.Integer, default=0)  # 좋아요 개수 추가
 
+# 댓글 테이블(comment_list)
+class CommentList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("post_list.id"), nullable=False) # 게시물 ID 참조 (FK)
+    content = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    post = db.relationship("PostList", backref=db.backref("comments", cascade="all, delete-orphan")) # 댓글과 게시물 간의 관계 설정

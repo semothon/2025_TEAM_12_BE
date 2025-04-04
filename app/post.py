@@ -5,6 +5,8 @@ from app.models import PostList
 
 post_bp = Blueprint("post", __name__)
 
+# 게시글 추가 (POST /posts/add)
+# 입력: JSON 형식으로 제목, 내용, 작성자
 @post_bp.route("/posts/add", methods=["POST"])
 def add_post():
     """새 게시글 추가"""
@@ -23,10 +25,10 @@ def add_post():
 
     return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
 
-# 게시글 조회 (GET /posts)
+# 게시글 전체 조회 (GET /posts)
+# 반환: JSON 형식으로 게시글 ID, 제목, 작성자, 작성시간
 @post_bp.route("/posts", methods=["GET"])
 def get_posts():
-    """게시글 목록 조회"""
     posts = PostList.query.all()
     result = [
         {
@@ -42,9 +44,9 @@ def get_posts():
 
 
 # 특정 게시글 조회 (GET /posts/<post_id>)
+# 반환: jSON 형식으로 게시글 ID, 제목, 내용, 작성자, 작성시간
 @post_bp.route("/posts/<int:post_id>", methods=["GET"])
 def get_post(post_id):
-    """특정 게시글 조회"""
     post = PostList.query.get(post_id)
     if not post:
         return jsonify({"error": "Post not found!"}), 404
@@ -61,9 +63,9 @@ def get_post(post_id):
 
 
 # 게시글 수정 (PUT /posts/<post_id>)
+# 입력: JSON 형식으로 제목, 내용
 @post_bp.route("/posts/update/<int:post_id>", methods=["PUT"])
 def update_post(post_id):
-    """게시글 수정"""
     post = PostList.query.get(post_id)
     if not post:
         return jsonify({"error": "Post not found!"}), 404
@@ -79,7 +81,6 @@ def update_post(post_id):
 # 게시글 삭제 (DELETE /posts/<post_id>)
 @post_bp.route("/posts/delete/<int:post_id>", methods=["DELETE"])
 def delete_post(post_id):
-    """게시글 삭제"""
     post = PostList.query.get(post_id)
     if not post:
         return jsonify({"error": "Post not found!"}), 404
@@ -87,4 +88,4 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
 
-    return jsonify({"message": f"Post '{post.title}' deleted!"})
+    return jsonify({"message": f"Post '{post.title}, post_id: {post_id}' deleted!"})
