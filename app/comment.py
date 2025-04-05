@@ -15,13 +15,11 @@ def add_comment():
     post_id = request.args.get("post_id", type=int)
     data = request.json
     content = data.get("content")
-    author = data.get("author")
 
-    if not all([post_id, content, author]):
+    if not all([post_id, content]):
         return jsonify({"error": "Missing required fields!"}), 400
 
-    new_comment = CommentList(post_id=post_id, content=content, author=author)
-    db.session.add(new_comment)
+    new_comment = CommentList(post_id=post_id, content=content)
     db.session.commit()
 
     return jsonify({"message": f"Comment added to post {post_id}!", "comment_id": new_comment.id}), 201
@@ -43,8 +41,7 @@ def get_comments():
         {
             "id": c.id,
             "content": c.content,
-            "author": c.author,
-            "created_at": c.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "created_at": c.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }
         for c in comments
     ]

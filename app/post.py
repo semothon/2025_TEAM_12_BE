@@ -14,7 +14,6 @@ def add_post():
     title = data.get("title")
     content = data.get("content")
     building_id = data.get("building_id")
-    # 사진 추가해야 됨
 
     if not all([title, content, building_id]):
         return jsonify({"error": "Missing required fields!"}), 400
@@ -27,7 +26,7 @@ def add_post():
 
 
 # 게시글 목록 조회 (GET /posts)
-# 입력: 쿼리 파라미터로 author (작성자)
+# 입력: 쿼리 파라미터로 building_id
 # 출력: JSON 형식으로 게시글 목록
 # building_id가 주어지면 해당 작성자의 게시글만 조회
 @post_bp.route("/posts", methods=["GET"])
@@ -38,7 +37,6 @@ def get_posts():
         posts = PostList.query.filter_by(building_id=building_id).all()
     else:
         posts = PostList.query.all()
-
     result = [
         {
             "id": p.id,
@@ -66,12 +64,12 @@ def update_post():
 
     post = PostList.query.get(post_id)
     if not post:
-        return jsonify({"error": "게시물 없음음"}), 404
+        return jsonify({"error": "게시물 없음"}), 404
 
     data = request.json
     post.title = data.get("title", post.title)
     post.content = data.get("content", post.content)
-    post.author = data.get("author", post.author)
+    post.building_id = data.get("building_id", post.building_id)
     db.session.commit()
 
     return jsonify({"message": f"Post '{post.title}' updated!"})
