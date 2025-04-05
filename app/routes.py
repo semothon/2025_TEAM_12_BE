@@ -38,6 +38,7 @@ def add_classroom():
     return jsonify({"message": f"Classroom {classroom.name} added under {building.name}!"}), 201
 
 
+
 @main_bp.route("/buildings", methods=["GET"])
 def get_buildings():
     """건물 및 강의실 조회 (개별 조회 가능)"""
@@ -55,6 +56,7 @@ def get_buildings():
             result = {
                 "id": building.id,
                 "name": building.name,
+                "image": app.image_to_base64(building.pictures),
                 "classrooms": [
                     {"id": c.id, "name": c.name, "floor": c.floor, "code": c.code}
                     for c in building.classrooms
@@ -80,7 +82,11 @@ def get_buildings():
 
     # ID가 없는 경우 모든 건물 목록만 반환
     buildings = app.Building.query.all()
-    result = [{"id": b.id, "name": b.name} for b in buildings]
+    result = [{
+        "id": b.id,
+        "name": b.name,
+        "image": app.image_to_base64(b.pictures)
+    } for b in buildings]
 
     return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
 

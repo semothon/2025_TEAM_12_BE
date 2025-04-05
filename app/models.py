@@ -4,6 +4,7 @@ from app.database import db
 class Building(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)  # 건물명
+    pictures = db.Column(db.String(255), nullable=False)
     classrooms = db.relationship("Classroom", backref="building", lazy=True)  # 1:N 관계
 
 # 강의실 테이블 (Classroom)
