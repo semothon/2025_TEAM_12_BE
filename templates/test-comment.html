@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>댓글 추가 테스트</title>
+</head>
+<body>
+    <h1>💬 댓글 달기</h1>
+    <form id="comment-form">
+        <label for="post_id">게시물 ID: </label>
+        <input type="number" id="post_id" name="post_id" required><br><br>
+
+        <label for="content">댓글 내용: </label><br>
+        <textarea id="content" name="content" rows="4" cols="50" required></textarea><br><br>
+
+        <button type="submit">댓글 추가</button>
+    </form>
+
+    <div id="response" style="margin-top:20px; color: green;"></div>
+
+    <script>
+        document.getElementById("comment-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const post_id = document.getElementById("post_id").value;
+            const content = document.getElementById("content").value;
+
+            try {
+                const res = await fetch("http://127.0.0.1:5000/comments/add", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        post_id: parseInt(post_id),
+                        content: content
+                    })
+                });
+
+                if (!res.ok) throw new Error("응답 실패");
+
+                const data = await res.json();
+                document.getElementById("response").innerText = "✅ 댓글 추가 성공! ID: " + data.id;
+            } catch (err) {
+                console.error("에러 발생:", err);
+                document.getElementById("response").innerText = "❌ 에러 발생: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>

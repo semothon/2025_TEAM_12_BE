@@ -50,12 +50,42 @@ def get_posts():
             "content": p.content,
             "building_id": p.building_id,
             "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "images": [f"/files/{f.id}" for f in p.files]  # 이미지 파일을 받을 수 있는 URL
+            "images": [f"/files/{f.id}" for f in p.files],
+            "comments": [
+                {
+                    "id": c.id,
+                    "content": c.content,
+                    "created_at": c.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                } for c in p.comments
+            ]
         })
 
     response = Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+from app.models import CommentList, PostList  # CommentList 모델 import 필요
+# 댓글 추가 (POST /comments/add)
+# 입력: JSON 형식으로 post_id, content
+# 댓글 추가 엔드포인트
+@post_bp.route("/comments/add", methods=["POST"])
+def add_comment():
+    data = request.json
+    post_id = data.get("post_id")
+    content = data.get("content")
+
+    if not post_id or not content:
+        return jsonify({"error": "필수 항목이 누락되었습니다!"}), 400
+
+    comment = CommentList(post_id=post_id, content=content)
+    db.session.add(comment)
+    db.session.commit()
+
+    response = jsonify({"message": "댓글 추가 성공!", "id": comment.id})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response, 201
+
+
 
 
 # 게시글 수정 (PUT /posts/<post_id>)

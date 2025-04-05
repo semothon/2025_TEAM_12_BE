@@ -2,6 +2,8 @@ from .models import Building, Classroom, Coalition, CoalitionList, Edge, Node
 from .libs import find_shortest_path, load_graph_from_db, time_to_travel, image_to_base64
 from .database import db
 
+from flask_cors import CORS
+
 from flask import Flask
 from app.database import db
 from app.routes import main_bp
@@ -16,6 +18,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    CORS(app)
 
     app.register_blueprint(main_bp)
     app.register_blueprint(post_bp)
