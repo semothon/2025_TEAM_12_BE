@@ -27,6 +27,30 @@ class CoalitionList(db.Model):
     what_type = db.Column(db.String(50), nullable=False)
     coalition_id = db.Column(db.Integer, db.ForeignKey("coalition.id"), nullable=False)  # 연합 테이블 참조 (FK)
 
+class Node(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+
+    outgoing_edges = db.relationship(
+        "Edge",
+        foreign_keys="[Edge.start_id]",
+        backref="start_node",
+        lazy=True,
+    )
+
+    incoming_edges = db.relationship(
+        "Edge",
+        foreign_keys="[Edge.end_id]",
+        backref="end_node",
+        lazy=True,
+    )
+
+class Edge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
+    end_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
+    distance = db.Column(db.Integer, nullable=False)
+
 
 # 게시물 목록 테이블(post_list)
 class PostList(db.Model):

@@ -1,7 +1,9 @@
 import json
 from flask import Blueprint, request, jsonify, Response
-from app.database import db
-from app.models import Building, Classroom
+from app import load_graph_from_db, find_shortest_path
+from app.models import Edge
+import app
+
 
 main_bp = Blueprint("main", __name__)
 
@@ -9,9 +11,9 @@ main_bp = Blueprint("main", __name__)
 def add_building():
     """새 건물 추가"""
     data = request.json
-    new_building = Building(name=data["name"])
-    db.session.add(new_building)
-    db.session.commit()
+    new_building = app.Building(name=data["name"])
+    app.db.session.add(new_building)
+    app.db.session.commit()
     return jsonify({"message": f"Building {new_building.name} added!"}), 201
 
 @main_bp.route("/add_classroom", methods=["POST"])
@@ -26,13 +28,13 @@ def add_classroom():
     if not all([building_id, name, floor, code]):
         return jsonify({"error": "Missing required fields!"}), 400
 
-    building = Building.query.get(building_id)
+    building = app.Building.query.get(building_id)
     if not building:
         return jsonify({"error": "Building not found!"}), 404
 
-    classroom = Classroom(name=name, floor=floor, code=code, building_id=building_id)
-    db.session.add(classroom)
-    db.session.commit()
+    classroom = app.Classroom(name=name, floor=floor, code=code, building_id=building_id)
+    app.db.session.add(classroom)
+    app.db.session.commit()
     return jsonify({"message": f"Classroom {classroom.name} added under {building.name}!"}), 201
 
 
@@ -46,7 +48,7 @@ def get_buildings():
 
         if len(parts) == 1:
             # 건물 ID만 주어진 경우
-            building = Building.query.get(parts[0])
+            building = app.Building.query.get(parts[0])
             if not building:
                 return jsonify({"error": "Building not found!"}), 404
 
@@ -63,7 +65,7 @@ def get_buildings():
         elif len(parts) == 2:
             # 건물ID-강의실ID 형식으로 요청된 경우
             building_id, classroom_id = parts
-            classroom = Classroom.query.filter_by(id=classroom_id, building_id=building_id).first()
+            classroom = app.Classroom.query.filter_by(id=classroom_id, building_id=building_id).first()
             if not classroom:
                 return jsonify({"error": "Classroom not found!"}), 404
 
@@ -77,11 +79,25 @@ def get_buildings():
             return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
 
     # ID가 없는 경우 모든 건물 목록만 반환
-    buildings = Building.query.all()
+    buildings = app.Building.query.all()
     result = [{"id": b.id, "name": b.name} for b in buildings]
 
     return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
 
 @main_bp.route("/navigate", methods=["GET", "POST"])
 def navigate():
-    return
+    App = app.create_app()
+    with App.app_context():
+        # DB에서 그래프 데이터 로드
+        graph = load_graph_from_db(Edge)
+
+        data = request.json
+        start_node = data.get("start")
+        end_node = data.get("end")
+        
+        shortest_distance, shortest_path = find_shortest_path(start_node, end_node, graph)
+
+        print(f"최단 거리: {shortest_distance}")
+        print(f"최단 경로: {' -> '.join(shortest_path)}")
+    
+    return "<p>chech console</p>"
