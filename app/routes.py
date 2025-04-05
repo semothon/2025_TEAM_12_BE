@@ -88,7 +88,7 @@ def get_buildings():
         # "image": app.image_to_base64(b.pictures)
     } for b in buildings]
 
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8",headers={"Access-Control-Allow-Origin": "*"})
 
 @main_bp.route("/navigate", methods=["GET", "POST"])
 def navigate():
@@ -190,7 +190,7 @@ def navigate():
                 "time": "N/A"
             }
 
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8", headers={"Access-Control-Allow-Origin": "*"})
 
 
 @main_bp.route("/autocomplete", methods=["GET"])
@@ -252,7 +252,7 @@ def autocomplete():
     for r in results:
         r.pop("score", None)
 
-    return jsonify(results)
+    return Response(json.dumps(results, ensure_ascii=False), content_type="application/json; charset=utf-8", headers={"Access-Control-Allow-Origin": "*"})
 
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
