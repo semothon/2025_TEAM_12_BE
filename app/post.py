@@ -22,7 +22,11 @@ def add_post():
     db.session.add(new_post)
     db.session.commit()
 
-    return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
+    # return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
+
+    response = jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response, 201
 
 
 # 게시글 목록 조회 (GET /posts)
@@ -47,12 +51,9 @@ def get_posts():
         }
         for p in posts
     ]
-
-    return Response(
-        json.dumps(result, ensure_ascii=False),
-        content_type="application/json; charset=utf-8"
-    )
-
+    response = Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 # 게시글 수정 (PUT /posts/<post_id>)
 # 입력: JSON 형식으로 제목, 내용
@@ -72,7 +73,9 @@ def update_post():
     post.building_id = data.get("building_id", post.building_id)
     db.session.commit()
 
-    return jsonify({"message": f"Post '{post.title}' updated!"})
+    response = jsonify({"message": f"Post '{post.title}' updated!"})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 # 게시글 삭제 (DELETE /posts/<post_id>)
@@ -88,6 +91,9 @@ def delete_post():
     db.session.delete(post)
     db.session.commit()
 
+    response = jsonify({"message": f"Post '{post.title}, post_id: {post_id}' deleted!"})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
     return jsonify({"message": f"Post '{post.title}, post_id: {post_id}' deleted!"})
 
 
