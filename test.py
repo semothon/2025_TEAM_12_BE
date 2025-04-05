@@ -44,12 +44,23 @@ def reset():
             else:
                 print("삭제할 데이터가 없음")
 
+def update_all_building_ids_to_six():
+    """Classroom 테이블의 모든 building_id를 6으로 수정"""
+    with app.app_context():
+        classrooms = Classroom.query.all()
+        for classroom in classrooms:
+            classroom.building_id = 6
+        db.session.commit()
+        print("✅ 모든 classroom의 building_id가 6으로 수정되었습니다.")
+
+
 if __name__ == "__main__":
     # reset()
-    while True:
+    update_all_building_ids_to_six()
+    # while True:
 
-        name = input("🏢 Enter building name: ")
-        add_building(name)
+    #     name = input("🏢 Enter building name: ")
+    #     add_building(name)
 
     
         # building_id = 16

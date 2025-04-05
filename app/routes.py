@@ -85,7 +85,7 @@ def get_buildings():
     result = [{
         "id": b.id,
         "name": b.name,
-        "image": app.image_to_base64(b.pictures)
+        # "image": app.image_to_base64(b.pictures)
     } for b in buildings]
 
     return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
