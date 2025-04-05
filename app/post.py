@@ -64,6 +64,29 @@ def get_posts():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
+from app.models import CommentList, PostList  # CommentList 모델 import 필요
+# 댓글 추가 (POST /comments/add)
+# 입력: JSON 형식으로 post_id, content
+# 댓글 추가 엔드포인트
+@post_bp.route("/comments/add", methods=["POST"])
+def add_comment():
+    data = request.json
+    post_id = data.get("post_id")
+    content = data.get("content")
+
+    if not post_id or not content:
+        return jsonify({"error": "필수 항목이 누락되었습니다!"}), 400
+
+    comment = CommentList(post_id=post_id, content=content)
+    db.session.add(comment)
+    db.session.commit()
+
+    response = jsonify({"message": "댓글 추가 성공!", "id": comment.id})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response, 201
+
+
+
 
 # 게시글 수정 (PUT /posts/<post_id>)
 # 입력: JSON 형식으로 제목, 내용
