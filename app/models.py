@@ -84,3 +84,10 @@ class Files(db.Model):
     path = db.Column(db.String(255), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post_list.id'), nullable=False)
     post = db.relationship('PostList', backref=db.backref('files', cascade="all, delete-orphan"))
+
+class Tips(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    link = db.Column(db.String(255), nullable=True)
+    building_id = db.Column(db.Integer, db.ForeignKey("building.id"), nullable=True) 
