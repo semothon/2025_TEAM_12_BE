@@ -1,6 +1,6 @@
 import json
 from flask import Blueprint, request, jsonify, Response
-from app import load_graph_from_db, find_shortest_path
+from app import load_graph_from_db, find_shortest_path, time_to_travel
 from app.models import Edge
 import app
 
@@ -94,10 +94,21 @@ def navigate():
         data = request.json
         start_node = data.get("start")
         end_node = data.get("end")
+        # start_node = "정문"
+        # end_node = "전정대"
         
         shortest_distance, shortest_path = find_shortest_path(start_node, end_node, graph)
 
-        print(f"최단 거리: {shortest_distance}")
-        print(f"최단 경로: {' -> '.join(shortest_path)}")
+        times = time_to_travel(shortest_distance)
+        print(shortest_distance)
+        print(f"걸리는 시간: {times}")
+        print(shortest_path)
+        # print(f"최단 경로: {' -> '.join(shortest_path)}")
     
-    return "<p>chech console</p>"
+        result = {
+            "path": shortest_path,
+            "distance": shortest_distance,
+            "time": times
+        }
+
+    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")

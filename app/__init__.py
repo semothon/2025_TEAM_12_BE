@@ -1,5 +1,5 @@
 from .models import Building, Classroom, Coalition, CoalitionList, Edge, Node
-from .libs import find_shortest_path, load_graph_from_db
+from .libs import find_shortest_path, load_graph_from_db, time_to_travel
 from .database import db
 
 from flask import Flask
