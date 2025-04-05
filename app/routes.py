@@ -128,7 +128,7 @@ def navigate():
 
 
         attempts = 0
-        max_attempts = 20
+        max_attempts = 25
         excluded_edges = set()
 
         shortest_distance = float('inf')
@@ -153,16 +153,23 @@ def navigate():
                 break  # 더 이상 경로 없음
 
             if is_path_unavailable(path, graph):
-                # 음수 간선 포함 경로: 기록만 하고 제외
                 if not invalid_path:
                     invalid_path = path
                 for i in range(len(path) - 1):
-                    excluded_edges.add((path[i], path[i + 1]))
+                    from_node = path[i]
+                    to_node = path[i + 1]
+                    edge = graph.get(from_node, {}).get(to_node)
+                    if edge is not None:
+                        _, under_construction = edge
+                        if under_construction == 1:  # ✅ 공사중인 edge만 제외
+                            excluded_edges.add((from_node, to_node))
+                            print("❌ 제외된 경로:", from_node, "->", to_node)
                 continue
             else:
                 shortest_distance = distance
                 shortest_path = path
                 break
+
 
         result = {}
 

@@ -6,7 +6,7 @@ def reset_edge_table():
     app = create_app()  # Flask 앱 생성
     with app.app_context():  # 애플리케이션 컨텍스
         
-        Building.__table__.drop(db.engine)
+        Edge.__table__.drop(db.engine)
         db.session.commit()
 
 # 실행
