@@ -82,5 +82,4 @@ class Files(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(255), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post_list.id'), nullable=False)
-
     post = db.relationship('PostList', backref=db.backref('files', cascade="all, delete-orphan"))
