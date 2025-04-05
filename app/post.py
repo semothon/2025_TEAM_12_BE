@@ -13,13 +13,13 @@ def add_post():
     data = request.json
     title = data.get("title")
     content = data.get("content")
-    author = data.get("author")
+    building_id = data.get("building_id")
     # 사진 추가해야 됨
 
-    if not all([title, content, author]):
+    if not all([title, content, building_id]):
         return jsonify({"error": "Missing required fields!"}), 400
 
-    new_post = PostList(title=title, content=content, author=author)
+    new_post = PostList(title=title, content=content, building_id=building_id)
     db.session.add(new_post)
     db.session.commit()
 
@@ -29,13 +29,13 @@ def add_post():
 # 게시글 목록 조회 (GET /posts)
 # 입력: 쿼리 파라미터로 author (작성자)
 # 출력: JSON 형식으로 게시글 목록
-# author가 주어지면 해당 작성자의 게시글만 조회
+# building_id가 주어지면 해당 작성자의 게시글만 조회
 @post_bp.route("/posts", methods=["GET"])
 def get_posts():
-    author = request.args.get("author")
+    building_id = request.args.get("building_id")
 
-    if author:
-        posts = PostList.query.filter_by(author=author).all()
+    if building_id:
+        posts = PostList.query.filter_by(building_id=building_id).all()
     else:
         posts = PostList.query.all()
 
@@ -44,7 +44,7 @@ def get_posts():
             "id": p.id,
             "title": p.title,
             "content": p.content,
-            "author": p.author,
+            "building_id": p.bilding_id,
             "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
         for p in posts
@@ -66,7 +66,7 @@ def update_post():
 
     post = PostList.query.get(post_id)
     if not post:
-        return jsonify({"error": "Post not found!"}), 404
+        return jsonify({"error": "게시물 없음음"}), 404
 
     data = request.json
     post.title = data.get("title", post.title)
@@ -85,7 +85,7 @@ def delete_post():
         return jsonify({"error": "post_id 쿼리가 필요합니다."}), 400
     post = PostList.query.get(post_id)
     if not post:
-        return jsonify({"error": "Post not found!"}), 404
+        return jsonify({"error": "게시물 없음"}), 404
 
     db.session.delete(post)
     db.session.commit()
