@@ -45,3 +45,10 @@ class CommentList(db.Model):
     author = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     post = db.relationship("PostList", backref=db.backref("comments", cascade="all, delete-orphan")) # 댓글과 게시물 간의 관계 설정
+
+# tip 테이블
+class TipList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    building_id = db.Column(db.Integer, nullable=True)
