@@ -50,7 +50,14 @@ def get_posts():
             "content": p.content,
             "building_id": p.building_id,
             "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "images": [f"/files/{f.id}" for f in p.files]  # 이미지 파일을 받을 수 있는 URL
+            "images": [f"/files/{f.id}" for f in p.files],
+            "comments": [
+                {
+                    "id": c.id,
+                    "content": c.content,
+                    "created_at": c.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                } for c in p.comments
+            ]
         })
 
     response = Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
