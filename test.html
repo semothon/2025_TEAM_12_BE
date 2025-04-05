@@ -39,7 +39,7 @@
         return;
       }
 
-      const res = await fetch(`/autocomplete?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/autocomplete?q=${encodeURIComponent(query)}&target=classes`);
       const results = await res.json();
 
       suggestionsBox.innerHTML = "";

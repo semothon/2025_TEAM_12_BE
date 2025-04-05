@@ -126,7 +126,6 @@ def navigate():
             return False
 
 
-
         attempts = 0
         max_attempts = 25
         excluded_edges = set()
@@ -203,63 +202,70 @@ def navigate():
 @main_bp.route("/autocomplete", methods=["GET"])
 def autocomplete():
     query = request.args.get("q", "").strip()
+    target = request.args.get("target", "").strip().lower()  # buildings / classes
+
     if not query:
         return jsonify([])
 
     chars = list(query)
+    results = []
 
-    # DB에서 문자 포함 필터링
-    building_query = app.Building.query
-    for ch in chars:
-        building_query = building_query.filter(app.Building.name.ilike(f"%{ch}%"))
-    building_matches = building_query.all()
-
-    classroom_query = app.Classroom.query
-    for ch in chars:
-        classroom_query = classroom_query.filter(
-            (app.Classroom.name.ilike(f"%{ch}%")) |
-            (app.Classroom.code.ilike(f"%{ch}%"))
-        )
-    classroom_matches = classroom_query.all()
-
-    # 글자 겹침 수 계산 함수
     def count_overlap(name, query):
         return sum(name.count(ch) for ch in query)
 
-    results = []
+    # 건물 검색
+    if target not in ("classes",):  # target이 없거나 "buildings"일 때
+        building_query = app.Building.query
+        for ch in chars:
+            building_query = building_query.filter(app.Building.name.ilike(f"%{ch}%"))
+        building_matches = building_query.all()
 
-    for b in building_matches:
-        score = count_overlap(b.name, query)
-        results.append({
-            "type": "building",
-            "id": b.id,
-            "name": b.name,
-            "score": score
-        })
+        for b in building_matches:
+            score = count_overlap(b.name, query)
+            results.append({
+                "type": "building",
+                "id": b.id,
+                "name": b.name,
+                "score": score
+            })
 
-    for c in classroom_matches:
-        score = max(
-            count_overlap(c.name, query),
-            count_overlap(c.code, query)
-        )
-        results.append({
-            "type": "classroom",
-            "id": c.id,
-            "name": c.name,
-            "code": c.code,
-            "floor": c.floor,
-            "building": c.building.name,
-            "score": score
-        })
+    # 교실 검색
+    if target not in ("buildings",):  # target이 없거나 "classes"일 때
+        classroom_query = app.Classroom.query
+        for ch in chars:
+            classroom_query = classroom_query.filter(
+                (app.Classroom.name.ilike(f"%{ch}%")) |
+                (app.Classroom.code.ilike(f"%{ch}%"))
+            )
+        classroom_matches = classroom_query.all()
+
+        for c in classroom_matches:
+            score = max(
+                count_overlap(c.name, query),
+                count_overlap(c.code, query)
+            )
+            results.append({
+                "type": "classroom",
+                "id": c.id,
+                "name": c.name,
+                "code": c.code,
+                "floor": c.floor,
+                "building": c.building.name,
+                "score": score
+            })
 
     # 점수 높은 순으로 정렬
     results.sort(key=lambda x: x["score"], reverse=True)
 
-    # 점수 제거하고 반환
+    # 점수 제거 후 반환
     for r in results:
         r.pop("score", None)
 
-    return Response(json.dumps(results, ensure_ascii=False), content_type="application/json; charset=utf-8", headers={"Access-Control-Allow-Origin": "*"})
+    return Response(
+        json.dumps(results, ensure_ascii=False),
+        content_type="application/json; charset=utf-8",
+        headers={"Access-Control-Allow-Origin": "*"}
+    )
 
 from flask import send_file, abort
 import os
