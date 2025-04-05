@@ -94,6 +94,7 @@ def get_buildings():
     response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
     return response
 
+
 @main_bp.route("/navigate", methods=["GET", "POST"])
 def navigate():
     return
