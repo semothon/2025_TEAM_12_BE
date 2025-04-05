@@ -20,6 +20,7 @@ def add_comment():
         return jsonify({"error": "Missing required fields!"}), 400
 
     new_comment = CommentList(post_id=post_id, content=content)
+    db.session.add(new_comment)
     db.session.commit()
 
     response = jsonify({"message": f"Comment added to post {post_id}!"}), 201
