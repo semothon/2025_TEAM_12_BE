@@ -73,12 +73,6 @@ class CommentList(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     post = db.relationship("PostList", backref=db.backref("comments", cascade="all, delete-orphan")) # 댓글과 게시물 간의 관계 설정
 
-# tip 테이블
-class TipList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    building_id = db.Column(db.Integer, nullable=False)
-
 class Files(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(255), nullable=False)
