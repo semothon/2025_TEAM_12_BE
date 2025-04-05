@@ -100,6 +100,7 @@ def delete_post():
     return jsonify({"message": f"Post '{post.title}, post_id: {post_id}' deleted!"})
 
 
+
 if __name__ == "__main__":
     import app
     app = app.create_app()  # create_app 함수가 있다면 사용 (Flask Factory Pattern)
