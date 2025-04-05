@@ -12,7 +12,10 @@ def add_building():
     new_building = Building(name=data["name"])
     db.session.add(new_building)
     db.session.commit()
-    return jsonify({"message": f"Building {new_building.name} added!"}), 201
+
+    response=jsonify({"message": f"Building {new_building.name} added!"}), 201
+    response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
+    return response
 
 @main_bp.route("/add_classroom", methods=["POST"])
 def add_classroom():
@@ -33,7 +36,10 @@ def add_classroom():
     classroom = Classroom(name=name, floor=floor, code=code, building_id=building_id)
     db.session.add(classroom)
     db.session.commit()
-    return jsonify({"message": f"Classroom {classroom.name} added under {building.name}!"}), 201
+
+    response = jsonify({"message": f"Classroom {classroom.name} added under {building.name}!"}), 201
+    response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
+    return response
 
 
 @main_bp.route("/buildings", methods=["GET"])
@@ -58,7 +64,9 @@ def get_buildings():
                     for c in building.classrooms
                 ],
             }
-            return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+            response=Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+            response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
+            return response
 
         elif len(parts) == 2:
             # 건물ID-강의실ID 형식으로 요청된 경우
@@ -74,13 +82,17 @@ def get_buildings():
                 "code": classroom.code,
                 "building_id": classroom.building_id,
             }
-            return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+            response=Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+            response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
+            return response
 
     # ID가 없는 경우 모든 건물 목록만 반환
     buildings = Building.query.all()
     result = [{"id": b.id, "name": b.name} for b in buildings]
 
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    response=Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    response.headers['Access-Control-Allow-Origin'] = '*' # CORS 설정
+    return response
 
 @main_bp.route("/navigate", methods=["GET", "POST"])
 def navigate():
