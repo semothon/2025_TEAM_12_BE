@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify, Response
 from app.database import db
 from werkzeug.utils import secure_filename
 from app.models import Files
-from app.database import db
 import os
 
 upload_bp = Blueprint("upload", __name__)

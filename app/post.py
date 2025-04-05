@@ -41,19 +41,22 @@ def get_posts():
         posts = PostList.query.filter_by(building_id=building_id).all()
     else:
         posts = PostList.query.all()
-    result = [
-        {
+
+    result = []
+    for p in posts:
+        result.append({
             "id": p.id,
             "title": p.title,
             "content": p.content,
-            "building_id": p.bilding_id,
+            "building_id": p.building_id,
             "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        for p in posts
-    ]
+            "images": [f"/files/{f.id}" for f in p.files]  # 이미지 파일을 받을 수 있는 URL
+        })
+
     response = Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
 
 # 게시글 수정 (PUT /posts/<post_id>)
 # 입력: JSON 형식으로 제목, 내용

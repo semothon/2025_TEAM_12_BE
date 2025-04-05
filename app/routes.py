@@ -261,6 +261,30 @@ def autocomplete():
 
     return Response(json.dumps(results, ensure_ascii=False), content_type="application/json; charset=utf-8", headers={"Access-Control-Allow-Origin": "*"})
 
+from flask import send_file, abort
+import os
+import mimetypes
+from app.models import Files
+@main_bp.route("/files/<int:file_id>")
+def serve_file(file_id):
+    file = Files.query.get(file_id)
+    if not file:
+        abort(404, description="File not found")
+
+    # 상대경로를 routes.py 기준 절대경로로 변환
+    current_dir = os.path.dirname(__file__)  # routes.py 파일 위치
+    relative_path = file.path.lstrip("/")  # "/statics/..." → "statics/..."
+    file_path = os.path.join(current_dir, "..", relative_path)  # app/../statics/...
+
+    file_path = os.path.normpath(file_path)  # 경로 정리
+
+    print("찾는 파일 경로:", file_path)
+
+    if not os.path.exists(file_path):
+        abort(404, description="File does not exist")
+
+    mime_type, _ = mimetypes.guess_type(file_path)
+    return send_file(file_path, mimetype=mime_type or "application/octet-stream")
 
 
 from flask import render_template_string
