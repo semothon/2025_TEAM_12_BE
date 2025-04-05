@@ -4,6 +4,7 @@ from app.database import db
 class Building(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)  # 건물명
+    pictures = db.Column(db.String(255), nullable=False)
     classrooms = db.relationship("Classroom", backref="building", lazy=True)  # 1:N 관계
 
 # 강의실 테이블 (Classroom)
@@ -26,6 +27,33 @@ class CoalitionList(db.Model):
     name = db.Column(db.String(255), nullable=False)
     what_type = db.Column(db.String(50), nullable=False)
     coalition_id = db.Column(db.Integer, db.ForeignKey("coalition.id"), nullable=False)  # 연합 테이블 참조 (FK)
+
+class Node(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+
+    outgoing_edges = db.relationship(
+        "Edge",
+        foreign_keys="[Edge.start_id]",
+        backref="start_node",
+        lazy=True,
+    )
+
+    incoming_edges = db.relationship(
+        "Edge",
+        foreign_keys="[Edge.end_id]",
+        backref="end_node",
+        lazy=True,
+    )
+
+
+class Edge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
+    end_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
+    distance = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, default=0)
+
 
 
 # 게시물 목록 테이블(post_list)
@@ -50,3 +78,9 @@ class TipList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     building_id = db.Column(db.Integer, nullable=False)
+
+class Files(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post_list.id'), nullable=False)
+    post = db.relationship('PostList', backref=db.backref('files', cascade="all, delete-orphan"))

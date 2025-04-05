@@ -24,4 +24,6 @@ def get_tip():
         for t in tips
     ]
 
-    return Response(json.dumps(result, ensure_ascii=False),content_type="application/json; charset=utf-8")
+    response=Response(json.dumps(result, ensure_ascii=False),content_type="application/json; charset=utf-8")
+    response.headers['Access-Control-Allow-Origin'] = '*'    
+    return response
