@@ -22,7 +22,9 @@ def add_comment():
     new_comment = CommentList(post_id=post_id, content=content)
     db.session.commit()
 
-    return jsonify({"message": f"Comment added to post {post_id}!", "comment_id": new_comment.id}), 201
+    response = jsonify({"message": f"Comment added to post {post_id}!"}), 201
+
+    return response
 
 
 
@@ -45,8 +47,9 @@ def get_comments():
         }
         for c in comments
     ]
-
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    response = Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    response.headers['Access-Control-Allow-Origin'] = '*'    
+    return response
 
 
 # 특정 댓글 삭제(DELETE /comments/<comment_id>)
@@ -64,4 +67,6 @@ def delete_comment():
     db.session.delete(comment)
     db.session.commit()
 
-    return jsonify({"message": f"Comment {comment_id} deleted!"})
+    response = jsonify({"message": f"Comment {comment_id} deleted!"})
+    response.headers['Access-Control-Allow-Origin'] = '*'    
+    return response
