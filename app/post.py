@@ -66,7 +66,7 @@ def update_post():
 
     post = PostList.query.get(post_id)
     if not post:
-        return jsonify({"error": "게시물 없음음"}), 404
+        return jsonify({"error": "게시물 없음"}), 404
 
     data = request.json
     post.title = data.get("title", post.title)
