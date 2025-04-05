@@ -25,47 +25,45 @@ def add_post():
 
     return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
 
-# 게시글 전체 조회 (GET /posts)
-# 반환: JSON 형식으로 게시글 ID, 제목, 작성자, 작성시간
+
+# 게시글 목록 조회 (GET /posts)
+# 입력: 쿼리 파라미터로 author (작성자)
+# 출력: JSON 형식으로 게시글 목록
+# author가 주어지면 해당 작성자의 게시글만 조회
 @post_bp.route("/posts", methods=["GET"])
 def get_posts():
-    posts = PostList.query.all()
+    author = request.args.get("author")
+
+    if author:
+        posts = PostList.query.filter_by(author=author).all()
+    else:
+        posts = PostList.query.all()
+
     result = [
         {
             "id": p.id,
             "title": p.title,
+            "content": p.content,
             "author": p.author,
             "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
         for p in posts
     ]
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
 
-
-
-# 특정 게시글 조회 (GET /posts/<post_id>)
-# 반환: jSON 형식으로 게시글 ID, 제목, 내용, 작성자, 작성시간
-@post_bp.route("/posts/<int:post_id>", methods=["GET"])
-def get_post(post_id):
-    post = PostList.query.get(post_id)
-    if not post:
-        return jsonify({"error": "Post not found!"}), 404
-
-    result = {
-        "id": post.id,
-        "title": post.title,
-        "content": post.content,
-        "author": post.author,
-        "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S")
-    }
-
-    return Response(json.dumps(result, ensure_ascii=False), content_type="application/json; charset=utf-8")
+    return Response(
+        json.dumps(result, ensure_ascii=False),
+        content_type="application/json; charset=utf-8"
+    )
 
 
 # 게시글 수정 (PUT /posts/<post_id>)
 # 입력: JSON 형식으로 제목, 내용
-@post_bp.route("/posts/update/<int:post_id>", methods=["PUT"])
-def update_post(post_id):
+@post_bp.route("/posts/update", methods=["PUT"])
+def update_post():
+    post_id = request.args.get("post_id", type=int)
+    if not post_id:
+        return jsonify({"error": "post_id 쿼리가 필요합니다."}), 400
+
     post = PostList.query.get(post_id)
     if not post:
         return jsonify({"error": "Post not found!"}), 404
@@ -73,14 +71,18 @@ def update_post(post_id):
     data = request.json
     post.title = data.get("title", post.title)
     post.content = data.get("content", post.content)
+    post.author = data.get("author", post.author)
     db.session.commit()
 
     return jsonify({"message": f"Post '{post.title}' updated!"})
 
 
 # 게시글 삭제 (DELETE /posts/<post_id>)
-@post_bp.route("/posts/delete/<int:post_id>", methods=["DELETE"])
-def delete_post(post_id):
+@post_bp.route("/posts/delete", methods=["DELETE"])
+def delete_post():
+    post_id = request.args.get("post_id", type=int)
+    if not post_id:
+        return jsonify({"error": "post_id 쿼리가 필요합니다."}), 400
     post = PostList.query.get(post_id)
     if not post:
         return jsonify({"error": "Post not found!"}), 404
