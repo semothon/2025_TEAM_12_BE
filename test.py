@@ -1,7 +1,8 @@
 
 from app import create_app
 from app.database import db
-from app.models import Building, Coalition, CoalitionList, Classroom
+from app.models import Building, Coalition, CoalitionList, Classroom, Files
+
 
 app = create_app()
 
@@ -35,8 +36,8 @@ def reset():
     app = create_app()
 
     with app.app_context():
-        for i in range(51, 66):
-            building = Classroom.query.get(i)  # ID가 1인 건물 조회
+        for i in range(11, 12):
+            building = Files.query.get(i)  # ID가 1인 건물 조회
             if building:
                 db.session.delete(building)
                 db.session.commit()
@@ -55,8 +56,8 @@ def update_all_building_ids_to_six():
 
 
 if __name__ == "__main__":
-    # reset()
-    update_all_building_ids_to_six()
+    reset()
+    # update_all_building_ids_to_six()
     # while True:
 
     #     name = input("🏢 Enter building name: ")

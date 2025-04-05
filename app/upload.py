@@ -18,15 +18,14 @@ def upload_files():
         return jsonify({"error": "No selected file"}), 400
 
     filename = secure_filename(f.filename)
-    upload_dir = os.path.join('statics', 'images')
+    upload_dir = os.path.join('statics', 'images', request.args.get('post_id'))
     os.makedirs(upload_dir, exist_ok=True)  # 디렉토리 없으면 생성
 
     file_path = os.path.join(upload_dir, filename)
     f.save(file_path)
 
-    # post_id는 임시로 1번 고정
     post_id = request.args.get('post_id')
-    new_file = Files(path=f'/statics/images/{filename}', post_id=post_id)
+    new_file = Files(path=f'/statics/images/{post_id}/{filename}', post_id=post_id)
 
     db.session.add(new_file)
     db.session.commit()
