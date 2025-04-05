@@ -22,7 +22,7 @@ def add_comment():
     new_comment = CommentList(post_id=post_id, content=content)
     db.session.commit()
 
-    return jsonify({"message": f"Comment added to post {post_id}!", "comment_id": new_comment.id}), 201
+    return jsonify({"message": f"Comment added to post {post_id}!"}), 201
 
 
 

@@ -22,7 +22,13 @@ def add_post():
     db.session.add(new_post)
     db.session.commit()
 
-    return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
+    # return jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id}), 201
+
+    response = jsonify({"message": f"Post '{new_post.title}' created!", "id": new_post.id})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'POST'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response, 201
 
 
 # 게시글 목록 조회 (GET /posts)
