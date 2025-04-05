@@ -45,11 +45,14 @@ class Node(db.Model):
         lazy=True,
     )
 
+
 class Edge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     start_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
     end_id = db.Column(db.Integer, db.ForeignKey("node.id"), nullable=False)
     distance = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, default=0)
+
 
 
 # 게시물 목록 테이블(post_list)
@@ -74,3 +77,10 @@ class TipList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     building_id = db.Column(db.Integer, nullable=False)
+
+class Files(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post_list.id'), nullable=False)
+
+    post = db.relationship('PostList', backref=db.backref('files', cascade="all, delete-orphan"))

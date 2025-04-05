@@ -8,9 +8,12 @@ def load_graph_from_db(someClass):
         start = edge.start_node.name
         end = edge.end_node.name
         distance = edge.distance
+        status = edge.status
 
         if start not in graph:
             graph[start] = {}
-        graph[start][end] = distance
+        graph[start][end] = (distance, status)
+
+    print(graph)
 
     return graph

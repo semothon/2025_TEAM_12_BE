@@ -89,3 +89,16 @@ def delete_post():
     db.session.commit()
 
     return jsonify({"message": f"Post '{post.title}, post_id: {post_id}' deleted!"})
+
+
+if __name__ == "__main__":
+    import app
+    app = app.create_app()  # create_app 함수가 있다면 사용 (Flask Factory Pattern)
+    with app.app_context():
+        new_post = PostList(
+            title='새 게시글 제목',
+            content='이것은 게시글 내용입니다.',
+            building_id=1
+        )
+        db.session.add(new_post)
+        db.session.commit()
